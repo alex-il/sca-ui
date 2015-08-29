@@ -1,0 +1,57 @@
+<Root><rule name="MethodReturnsInternalArray" message="Never return a reference to an internal array that contains sensitive data" class="net.sourceforge.pmd.rules.sunsecure.MethodReturnsInternalArray">
+      <description>
+      Exposing internal arrays directly allows the user to modify some code that could be critical.
+      It is safer to return a copy of the array.
+      </description>
+        <priority>3</priority>
+      <example>
+  <![CDATA[
+  public class SecureSystem {
+      UserData [] ud;
+      
+      public UserData [] getUserData() {
+          // Don't return directly the internal array, return a copy 
+          return ud;
+      }
+  }
+  ]]>
+      </example>
+      </rule>
+   <rule name="ArrayIsStoredDirectly" message="A user given array is stored directly" class="net.sourceforge.pmd.rules.sunsecure.ArrayIsStoredDirectly">
+      <description>
+      Constructors and methods receiving arrays shuold clone objects and store the copy.
+      This prevents that future changes from the user affect the internal functionallity.
+      </description>
+        <priority>3</priority>
+      <example>
+  <![CDATA[
+  public class Foo {
+  private String [] x;
+  
+      public void foo (String [] param) {
+          // Don't do this, make a copy of the array at least
+          this.x=param;
+      }
+  }
+  
+  ]]>
+      </example>
+      </rule>
+      
+
+<rule name="AvoidInnerClasses" message="Avoid using of Inner classes" class="net.sourceforge.pmd.rules.XPathRule">
+      <description> Scurity reason : Avoid using of Inner classes
+      </description>
+      <properties>
+          <property name="xpath">
+              <value>
+              <![CDATA[
+                //ClassOrInterfaceDeclaration[@Nested='true' and count(*) > 1]     
+              ]]>
+             </value>
+          </property>
+      </properties>
+        <priority>3</priority>
+      </rule>      
+
+ </Root>

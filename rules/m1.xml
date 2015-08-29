@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+
+<ruleset >
+  
+
+  <rule name="SingleTone"
+   message="{0} SingleTone  {1} Implimentation Problem {2}  {3}" 
+ class="com.sca.rule.SingleTone">
+
+    <description>
+Detects when a new object is created inside a loop
+  </description>
+      	
+	<priority>3</priority>
+ 
+  </rule>   	
+
+</ruleset>
+ 

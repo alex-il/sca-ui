@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+
+<ruleset name="Optimization Rules" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../etc/ruleset_xml_schema.xml">
+  <description>
+These rules deal with different optimizations that generally apply to performance best practices.
+  </description>
+
+    <rule name="LocalVariableCouldBeFinal"
+          message="Local variable could be declared final"
+          class="net.sourceforge.pmd.rules.optimization.LocalVariableCouldBeFinal">
+      <description>
+      A local variable assigned only once can be declared final.
+      </description>
+        <priority>3</priority>
+
+      <example>
+  <![CDATA[
+  public void foo () {
+   String a = "a"; //if a will not be assigned again it is better to do this:
+   final String b = "b";
+   ...   
+  }
+  ]]>
+      </example>
+      </rule>
+
+    <rule name="MethodArgumentCouldBeFinal"
+          message="Parameter ''{0}'' is not assigned and could be declared final"
+         
+          class="net.sourceforge.pmd.rules.optimization.MethodArgumentCouldBeFinal">
+      <description>
+      A method argument that is never assigned can be declared final.
+      </description>
+        <priority>3</priority>
+      <example>
+  <![CDATA[
+  public void foo (String param) {
+      // do stuff with param never assigning it
+      // better: public void foo (final String param) {
+  }
+  ]]>
+      </example>
+      </rule>
+
+
+  <rule name="AvoidInstantiatingObjectsInLoops"
+        message="Avoid instantiating new objects inside loops"
+        class="net.sourceforge.pmd.rules.optimization.AvoidInstantiatingObjectsInLoops">
+    <description>
+Detects when a new object is created inside a loop
+    </description>
+      <priority>3</priority>
+    <example>
+<![CDATA[
+public class Something {
+  public static void main( String as[] ) {  
+    for (int i = 0; i < 10; i++) {
+      Foo f = new Foo(); //Avoid this whenever you can it's really expensive
+    }
+  }
+}
+]]>
+    </example>
+  </rule>
+  
+
+
+    <rule name="UseArrayListInsteadOfVector"
+          message="Use ArrayList instead of Vector"
+          class="net.sourceforge.pmd.rules.XPathRule">
+      <description>
+          ArrayList is a much better Collection implementation than Vector.
+      </description>
+      <properties>
+          <property name="xpath">
+              <value>
+<![CDATA[
+//AllocationExpression/ClassOrInterfaceType[@Image='Vector' or @Image='java.util.Vector']
+]]>
+              </value>
+          </property>
+      </properties>
+        <priority>3</priority>
+
+      <example>
+<![CDATA[
+public class SimpleTest extends TestCase {
+    public void testX() {
+    Collection c = new Vector();
+    // This achieves the same with much better performance
+    // Collection c = new ArrayList();
+    }
+}
+]]>
+          </example>
+    </rule>
+
+    <rule name="SimplifyStartsWith"
+          message="This call to String.startsWith can be rewritten using String.charAt(0)"
+          class="net.sourceforge.pmd.rules.XPathRule">
+      <description>
+      Since it passes in a literal of length 1, this call to String.startsWith can be rewritten using String.charAt(0) to save some time.
+      </description>
+    <properties>
+        <property name="xpath">
+            <value>
+                <![CDATA[
+//PrimaryExpression
+ [PrimaryPrefix/Name
+  [ends-with(@Image, '.startsWith')]]
+ [PrimarySuffix/Arguments/ArgumentList
+  /Expression/PrimaryExpression/PrimaryPrefix
+  /Literal
+   [string-length(@Image)=3]
+   [starts-with(@Image, '"')]
+   [ends-with(@Image, '"')]
+ ]
+ ]]>
+            </value>
+        </property>
+    </properties>
+        <priority>3</priority>
+      <example>
+  <![CDATA[public class Foo {
+      boolean checkIt(String x) {
+          return x.startsWith("a");
+      }
+  }]]>
+      </example>
+    </rule>
+
+    <rule name="UseStringBufferForStringAppends"
+              message="Prefer StringBuffer over += for concatenating strings"
+              class="net.sourceforge.pmd.rules.XPathRule">
+           <description>
+      Finds usages of += for appending strings.
+           </description>
+          <properties>
+              <property name="xpath">
+                  <value>
+                      <![CDATA[
+//StatementExpression
+    [PrimaryExpression/PrimaryPrefix/Name
+        [@Image = ancestor::MethodDeclaration//LocalVariableDeclaration
+            [./Type//ClassOrInterfaceType[@Image =
+'String']]/VariableDeclarator/VariableDeclaratorId/@Image]]
+    //AssignmentOperator[@Compound='true']
+                      ]]>
+                  </value>
+              </property>
+          </properties>
+            <priority>3</priority>
+
+           <example>
+      <![CDATA[
+         String a;
+
+         a = "foo";
+         a += " bar";
+
+         // better would be:
+         StringBuffer a = new StringBuffer("foo");
+         a.append(" bar);
+      ]]>
+           </example>
+        </rule>
+
+    <!-- 
+    other optimization shuold be like avoiding 
+    "" + int
+    or "" + (int) i
+    and String.valueOf(int)
+    
+    and using Integer.toString(int)
+
+    IntegerToStringShuoldBeUsed
+    LongToStringShuoldBeUsed    
+    BooleanToStringShuoldBeUsed    
+    -->
+
+</ruleset>
+
+
+
+                                             
